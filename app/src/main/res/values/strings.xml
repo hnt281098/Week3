@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Week 3</string>
+    <string name="facebook_app_id">2179461609050039</string>
+    <string name="fb_login_protocol_scheme">fb2179461609050039</string>
+    <string name="avatar">avatar</string>
+    <string name="like">Like</string>
+    <string name="comment">Comment</string>
+    <string name="share">Share</string>
+    <string name="_100">100</string>
+    <string name="what_do_you_think_about_this">What do you think about this ?</string>
+    <string name="btn_send">btn_send</string>
+</resources>
