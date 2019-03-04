@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.example.week3
 
 import android.os.Bundle
@@ -18,10 +20,9 @@ class DialogImageFull : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val img : ImageView = view.imageViewFull
+        val img: ImageView = view.imageViewFull
 
-
-//        GlideApp.with(context!!).load(arguments?.getString("url")).into(img)
+        GlideApp.with(context!!).load(arguments?.getString("url")).into(img)
     }
 
     override fun onResume() {

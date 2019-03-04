@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.example.week3
 
 import android.content.Context
@@ -16,7 +18,7 @@ import com.example.week3.data.Datum
 import jp.wasabeef.glide.transformations.CropCircleTransformation
 
 @Suppress("DEPRECATION")
-class AdapterRecyclerView(val context: Context, val arr: ArrayList<Datum>): RecyclerView.Adapter<AdapterRecyclerView.ViewHolder>() {
+class AdapterRecyclerView(val context: Context, private val arr: ArrayList<Datum>): RecyclerView.Adapter<AdapterRecyclerView.ViewHolder>() {
     enum class Type{
         profile_media,
         share,
@@ -33,8 +35,6 @@ class AdapterRecyclerView(val context: Context, val arr: ArrayList<Datum>): Recy
 
     override fun onBindViewHolder(p0: ViewHolder, p1: Int) {
         val datum = arr[p1]
-
-//        var date = SimpleDateFormat("dd-MM-yyyy hh:mm:ss").parse()
         p0.txtDate.text = DateUtils.getRelativeTimeSpanString(datum.created_time * 1000L , System.currentTimeMillis(),DateUtils.MINUTE_IN_MILLIS).toString()
 
         if(datum.attachments?.data?.get(0)?.url != null){
@@ -59,9 +59,9 @@ class AdapterRecyclerView(val context: Context, val arr: ArrayList<Datum>): Recy
             p0.txtStatus.visibility = View.GONE
         else {
             p0.txtStatus.visibility = View.VISIBLE
-            if(!datum.message?.any { it == '#' })
+            if(!datum.message.any { it == '#' }) {
                 p0.txtStatus.text = datum.message
-            else{
+            } else{
                 p0.txtStatus.text = datum.message
                 p0.txtStatus.setTextColor(Color.BLACK)
             }
@@ -73,7 +73,7 @@ class AdapterRecyclerView(val context: Context, val arr: ArrayList<Datum>): Recy
         GlideApp.with(context).load(datum.from?.picture?.data?.url)
             .placeholder(R.drawable.user)
             .apply(bitmapTransform(CropCircleTransformation()))
-            .into(p0.imgAvata)
+            .into(p0.imgAvatar)
 
         p0.txtLike.setOnClickListener {
             p0.txtLike.setCompoundDrawablesWithIntrinsicBounds(R.drawable.fb_like, 0, 0, 0)
@@ -82,7 +82,7 @@ class AdapterRecyclerView(val context: Context, val arr: ArrayList<Datum>): Recy
 
         p0.linear.setOnClickListener {
 //            var i = Intent(context, DetailsActivity::class.java)
-////            i.putExtra("datum" , datum)
+//            i.putExtra("datum" , datum)
 //            context.startActivity(i)
         }
     }
@@ -93,11 +93,11 @@ class AdapterRecyclerView(val context: Context, val arr: ArrayList<Datum>): Recy
         var txtLike : TextView = item.findViewById(R.id.txtLike)
         var txtLink : TextView = item.findViewById(R.id.txtLink)
         var txtType : TextView = item.findViewById(R.id.txtType)
-        var txtComment : TextView = item.findViewById(R.id.txtComment)
-        var txtShare : TextView = item.findViewById(R.id.txtShare)
+//        var txtComment : TextView = item.findViewById(R.id.txtComment)
+//        var txtShare : TextView = item.findViewById(R.id.txtShare)
         var txtStatus : TextView = item.findViewById(R.id.txtStatus)
         var img : ImageView = item.findViewById(R.id.img)
-        var imgAvata : ImageView = item.findViewById(R.id.imgAvata)
+        var imgAvatar : ImageView = item.findViewById(R.id.imgAvatar)
         var linear : LinearLayout = item.findViewById(R.id.linear)
     }
 }

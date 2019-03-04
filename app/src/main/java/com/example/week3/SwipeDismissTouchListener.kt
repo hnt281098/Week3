@@ -5,10 +5,9 @@ import android.view.MotionEvent
 import android.view.View
 import android.animation.ValueAnimator
 import android.animation.AnimatorListenerAdapter
+import android.annotation.SuppressLint
 import android.view.VelocityTracker
 import android.view.ViewConfiguration
-
-
 
 class SwipeDismissTouchListener(view: View, token: Any?, callbacks: DismissCallbacks) : View.OnTouchListener {
 
@@ -33,7 +32,7 @@ class SwipeDismissTouchListener(view: View, token: Any?, callbacks: DismissCallb
     private var mVelocityTracker: VelocityTracker? = null
     private var mTranslationX: Float = 0.toFloat()
 
-    private val mWasMoved: Boolean = false
+//    private val mWasMoved: Boolean = false
 
     /**
      * The callback interface used by [SwipeDismissTouchListener] to inform its client
@@ -75,6 +74,7 @@ class SwipeDismissTouchListener(view: View, token: Any?, callbacks: DismissCallb
         mCallbacks = callbacks
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onTouch(view: View, motionEvent: MotionEvent): Boolean {
         // offset because the view is translated during swipe
         motionEvent.offsetLocation(mTranslationX, 0f)

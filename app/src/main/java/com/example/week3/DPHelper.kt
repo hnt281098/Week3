@@ -14,9 +14,9 @@ import java.io.FileOutputStream
 
 class DPHelper(context: Context) {
 
-    var DATABASE_NAME = "db_week3.db"
+    private var DATABASE_NAME = "db.db"
     private val DB_PATH_SUFFIX = "/databases/"
-    var db: SQLiteDatabase? = null
+    private var db: SQLiteDatabase? = null
 
     var context: Context? = null
 
@@ -43,7 +43,7 @@ class DPHelper(context: Context) {
 
     private fun CopyDatabaseFromAsset() {
         try {
-            val databaseInputStream = context?.assets?.open("SQL/$DATABASE_NAME")
+            val databaseInputStream = context?.assets?.open("sql/$DATABASE_NAME")
 
 
             val outputStream = getPathDatabaseSystem()
@@ -58,9 +58,7 @@ class DPHelper(context: Context) {
             val buffer = ByteArray(1024)
             var length = 0
             while (true) {
-                if (databaseInputStream != null) {
-                    length = databaseInputStream.read(buffer)
-                }
+                if (databaseInputStream != null) length = databaseInputStream.read(buffer)
                 if(length > 0)
                     databaseOutputStream.write(buffer, 0, length)
                 else

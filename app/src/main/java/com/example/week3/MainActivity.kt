@@ -1,7 +1,8 @@
+@file:Suppress("DEPRECATION")
+
 package com.example.week3
 
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -18,9 +19,9 @@ import android.support.v7.widget.RecyclerView
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import com.example.week3.data.Datum
-import com.example.week3.data.GraphObject
+import com.example.week3.data.*
 import com.facebook.*
+import com.facebook.appevents.AppEventsLogger
 import com.google.gson.GsonBuilder
 import org.json.JSONObject
 
@@ -28,44 +29,44 @@ import org.json.JSONObject
 @Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity() {
 
-    lateinit var callbackManeger: CallbackManager
-    lateinit var loginButton: LoginButton
-    lateinit var scrollListener : EndlessRecyclerViewScrollListener
-    lateinit var arrData : ArrayList<Datum>
-    lateinit var adapter : AdapterRecyclerView
-    lateinit var dpHelper : DPHelper
-    lateinit var result : GraphObject
+    private lateinit var callbackManager: CallbackManager
+    private lateinit var loginButton: LoginButton
+    private lateinit var scrollListener : EndlessRecyclerViewScrollListener
+    private lateinit var arrData : ArrayList<Datum>
+    private lateinit var adapter : AdapterRecyclerView
+    private lateinit var dpHelper : DPHelper
+    private lateinit var result : GraphObject
 
-    var lastGraphResponse : GraphResponse? = null
-    var firstGraphResponse : GraphResponse? = null
+    private var lastGraphResponse : GraphResponse? = null
+    private var firstGraphResponse : GraphResponse? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         FacebookSdk.sdkInitialize(applicationContext)
         setContentView(R.layout.activity_main)
-        val token = AccessToken.getCurrentAccessToken()
 
-        dpHelper = DPHelper(this)
+        dpHelper = DPHelper(applicationContext)
         dpHelper.initDB()
         arrData = ArrayList()
 
-        checkSign(token)
+        checkSign()
 
-        adapter = AdapterRecyclerView(this, arrData)
-        val layout = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        adapter = AdapterRecyclerView(applicationContext, arrData)
+        val layout = LinearLayoutManager(applicationContext, LinearLayoutManager.VERTICAL, false)
         recycler_view.layoutManager = layout
         recycler_view.adapter = adapter
 
         loginButton = this.findViewById(R.id.login_button)
-        callbackManeger =  CallbackManager.Factory.create()
+        callbackManager =  CallbackManager.Factory.create()
 
-        loginWithFB()
+        loginButton.setOnClickListener {
+            loginWithFB()
+        }
 
-        scrollListener = object : EndlessRecyclerViewScrollListener(LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)){
+        scrollListener = object : EndlessRecyclerViewScrollListener(LinearLayoutManager(applicationContext, LinearLayoutManager.VERTICAL, false)){
             override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView) {
-                Log.d("Pagee" , page.toString())
-//                progress_waiting.visibility = View.VISIBLE
+                Log.d("Page" , page.toString())
                 loadNextData()
             }
 
@@ -78,9 +79,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun checkSign(token: AccessToken?){
-        if (token == null) { // Logout
-            Toast.makeText(applicationContext, "logout", Toast.LENGTH_LONG).show()
+    private fun checkSign(){
+        if (AccessToken.getCurrentAccessToken() == null) { // Logout
             login_button.visibility = View.VISIBLE
             supportActionBar?.hide()
             ic_fb.visibility = View.VISIBLE
@@ -88,13 +88,14 @@ class MainActivity : AppCompatActivity() {
             swipeRefresh.isEnabled = false
         }
         else{ // Login
-            Toast.makeText(applicationContext, "login", Toast.LENGTH_LONG).show()
-            if(!(isNetworkAvailable() as Boolean)){
-                arrData.addAll(dpHelper.getAllData())
+            if(!isNetworkAvailable()){
+                Toast.makeText(applicationContext, "not login", Toast.LENGTH_LONG).show()
+//                arrData.addAll(dpHelper.getAllData())
                 swipeRefresh.isEnabled = false
             }
             else {
-                dpHelper.clearData()
+                Toast.makeText(applicationContext, "login", Toast.LENGTH_LONG).show()
+//                dpHelper.clearData()
                 getGraph().executeAsync()
             }
 
@@ -108,7 +109,7 @@ class MainActivity : AppCompatActivity() {
     private fun getGraph(): GraphRequest {
         return GraphRequest(
             AccessToken.getCurrentAccessToken(),
-            "/me/feed?fields=created_time,likes.summary(true),attachments{},object_id,id,message,from{name,picture.height(300).width(300),id}&date_format=U",
+            "me/feed?fields=created_time,likes.summary(true),attachments{},object_id,id,message,from{name,picture.height(300).width(300),id}&date_format=U",
             null,
             HttpMethod.GET, GraphRequest.Callback { response ->
                 swipeRefresh.isRefreshing = true
@@ -123,7 +124,7 @@ class MainActivity : AppCompatActivity() {
                     if(arrData.size > 0)
                         dpHelper.insertData(arrData)
                 } else
-                    Toast.makeText(applicationContext , "Null" , Toast.LENGTH_SHORT).show()
+                    Toast.makeText(applicationContext , "null" , Toast.LENGTH_SHORT).show()
             }
         )
     }
@@ -141,11 +142,12 @@ class MainActivity : AppCompatActivity() {
                 adapter.notifyItemRangeInserted(arrData.size , result.data.size - 1)
                 adapter.notifyDataSetChanged()
                 swipeRefresh.isRefreshing = false
+                Toast.makeText(applicationContext , "success" , Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    private fun isNetworkAvailable(): Any {
+    private fun isNetworkAvailable(): Boolean {
         val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetworkInfo = connectivityManager.activeNetworkInfo
         return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting
@@ -153,7 +155,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadDataRefresh() {
         swipeRefresh.isRefreshing = true
-        if(!(isNetworkAvailable() as Boolean)) {
+        if(isNetworkAvailable()) {
             arrData.clear()
         }
         val graphRequest = firstGraphResponse?.request
@@ -162,7 +164,7 @@ class MainActivity : AppCompatActivity() {
                 if(response.jsonObject != null){
                     pareData(response.jsonObject)
                     scrollListener.resetState()
-                    Log.d("abc" , "Refresh")
+                    Log.d("abc" , "refresh")
                     swipeRefresh.isRefreshing = false
                 }
             }
@@ -179,8 +181,6 @@ class MainActivity : AppCompatActivity() {
             nextResultsRequests.callback = GraphRequest.Callback { response ->
 
                 pareData(response.jsonObject)
-
-                //save the last GraphResponse you received
                 lastGraphResponse = response
             }
             nextResultsRequests.executeAsync()
@@ -195,41 +195,40 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         if(item?.itemId == R.id.menuLogout){
             val alertDialog = AlertDialog.Builder(this)
-            alertDialog.setMessage("Are you sure you want to log out ?")
-            alertDialog.setNegativeButton("No" , object : DialogInterface.OnClickListener{
-                override fun onClick(dialog: DialogInterface?, which: Int) {
-                }
-            })
-            alertDialog.setPositiveButton("Yes" , object : DialogInterface.OnClickListener{
-                override fun onClick(dialog: DialogInterface?, which: Int) {
-                    LoginManager.getInstance().logOut()
-                    login_button.visibility = View.VISIBLE
-                    supportActionBar?.hide()
-                    arrData.clear()
-                    adapter.notifyDataSetChanged()
-                    ic_fb.visibility = View.VISIBLE
-                    login_button.isEnabled = true
-                    swipeRefresh.isEnabled = false
-                    dpHelper.clearData()
-                }
-            })
+            alertDialog.setMessage("are you sure you want to logout ?")
+            alertDialog.setNegativeButton("no") { _, _ -> }
+            alertDialog.setPositiveButton("yes") { _, _ ->
+                Toast.makeText(applicationContext, "logout", Toast.LENGTH_LONG).show()
+                LoginManager.getInstance().logOut()
+                ic_fb.visibility = View.VISIBLE
+                login_button.visibility = View.VISIBLE
+                login_button.isEnabled = true
+                supportActionBar?.hide()
+                arrData.clear()
+                adapter.notifyDataSetChanged()
+                swipeRefresh.isEnabled = false
+                //                    dpHelper.clearData()
+            }
             alertDialog.show()
         }
         return super.onOptionsItemSelected(item)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        callbackManeger.onActivityResult(requestCode, resultCode, data)
+        callbackManager.onActivityResult(requestCode, resultCode, data)
         super.onActivityResult(requestCode, resultCode, data)
     }
 
     private fun loginWithFB(){
+        AppEventsLogger.activateApp(applicationContext)
         loginButton.setReadPermissions("email")
+        loginButton.setReadPermissions("user_posts")
 
-        loginButton.registerCallback(callbackManeger, object: FacebookCallback<LoginResult>{
+        loginButton.registerCallback(callbackManager, object: FacebookCallback<LoginResult>{
             override fun onSuccess(result: LoginResult?) {
                 getGraph().executeAsync()
                 swipeRefresh.isEnabled = true
+                checkSign()
             }
 
             override fun onCancel() {
@@ -237,10 +236,8 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onError(error: FacebookException?) {
-                Toast.makeText(applicationContext, "error", Toast.LENGTH_LONG).show()
-                if (error != null) {
-                    Log.d("Error" , error.message.toString())
-                }
+                Toast.makeText(applicationContext, "error connect", Toast.LENGTH_LONG).show()
+                Log.d("Error" , error!!.message.toString())
             }
 
         } )
