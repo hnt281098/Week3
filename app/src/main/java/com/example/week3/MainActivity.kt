@@ -19,7 +19,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import com.example.week3.data.*
+import com.example.week3.modal.*
 import com.facebook.*
 import com.facebook.appevents.AppEventsLogger
 import com.google.gson.GsonBuilder
@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var callbackManager: CallbackManager
     private lateinit var loginButton: LoginButton
     private lateinit var scrollListener : EndlessRecyclerViewScrollListener
-    private lateinit var arrData : ArrayList<Datum>
+    private lateinit var arrData : ArrayList<Data>
     private lateinit var adapter : AdapterRecyclerView
     private lateinit var dpHelper : DPHelper
     private lateinit var result : GraphObject
@@ -58,6 +58,8 @@ class MainActivity : AppCompatActivity() {
         recycler_view.adapter = adapter
 
         loginButton = this.findViewById(R.id.login_button)
+        loginButton.setReadPermissions("email")
+        loginButton.setReadPermissions("user_posts")
         callbackManager =  CallbackManager.Factory.create()
 
         loginButton.setOnClickListener {
@@ -90,15 +92,15 @@ class MainActivity : AppCompatActivity() {
         else{ // Login
             if(!isNetworkAvailable()){
                 Toast.makeText(applicationContext, "not login", Toast.LENGTH_LONG).show()
-//                arrData.addAll(dpHelper.getAllData())
+                arrData.addAll(dpHelper.getAllData())
                 swipeRefresh.isEnabled = false
             }
             else {
                 Toast.makeText(applicationContext, "login", Toast.LENGTH_LONG).show()
-//                dpHelper.clearData()
+                dpHelper.clearData()
                 getGraph().executeAsync()
             }
-
+            title = "NewFit"
             login_button.visibility = View.GONE
             supportActionBar?.show()
             ic_fb.visibility = View.GONE
@@ -130,19 +132,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun pareData(jsonObject: JSONObject?) {
-        Log.d("responsee" ,jsonObject.toString())
+        Log.d("response" ,jsonObject.toString())
         val gsonBuilder = GsonBuilder()
 
         gsonBuilder.setDateFormat("dd/MM/yyyy hh:mm a")
         val gson = gsonBuilder.create()
         if(gson?.fromJson(jsonObject.toString(), GraphObject::class.java) != null){
             result = gson.fromJson(jsonObject.toString(), GraphObject::class.java)
-            if(result.data.size > 0){
-                arrData.addAll(result.data)
-                adapter.notifyItemRangeInserted(arrData.size , result.data.size - 1)
+            if(result.data!!.isNotEmpty()){
+                arrData.addAll(result.data!!)
+                adapter.notifyItemRangeInserted(arrData.size , result.data!!.size - 1)
                 adapter.notifyDataSetChanged()
                 swipeRefresh.isRefreshing = false
-                Toast.makeText(applicationContext , "success" , Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -207,7 +208,7 @@ class MainActivity : AppCompatActivity() {
                 arrData.clear()
                 adapter.notifyDataSetChanged()
                 swipeRefresh.isEnabled = false
-                //                    dpHelper.clearData()
+                dpHelper.clearData()
             }
             alertDialog.show()
         }
@@ -221,8 +222,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun loginWithFB(){
         AppEventsLogger.activateApp(applicationContext)
-        loginButton.setReadPermissions("email")
-        loginButton.setReadPermissions("user_posts")
 
         loginButton.registerCallback(callbackManager, object: FacebookCallback<LoginResult>{
             override fun onSuccess(result: LoginResult?) {

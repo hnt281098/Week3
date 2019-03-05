@@ -5,7 +5,7 @@ import android.content.Context
 import android.widget.Toast
 import android.database.sqlite.SQLiteDatabase
 import android.util.Log
-import com.example.week3.data.*
+import com.example.week3.modal.*
 import java.io.File
 import java.io.FileOutputStream
 
@@ -14,7 +14,7 @@ import java.io.FileOutputStream
 
 class DPHelper(context: Context) {
 
-    private var DATABASE_NAME = "db.db"
+    private var DATABASE_NAME = "db_week_3.db"
     private val DB_PATH_SUFFIX = "/databases/"
     private var db: SQLiteDatabase? = null
 
@@ -28,15 +28,12 @@ class DPHelper(context: Context) {
     private fun processSQLite() {
         val dbFile = context?.getDatabasePath(DATABASE_NAME)
         if (dbFile != null) {
-            if (!dbFile.exists()) {
-                try {
-                    CopyDatabaseFromAsset()
-                    Toast.makeText(context, "Copy successful !!!", Toast.LENGTH_SHORT).show()
+            if (!dbFile.exists()) try {
+                CopyDatabaseFromAsset()
+                Toast.makeText(context, "Copy successful", Toast.LENGTH_SHORT).show()
 
-                } catch (ex: Exception) {
-                    ex.printStackTrace()
-                }
-
+            } catch (ex: Exception) {
+                ex.printStackTrace()
             }
         }
     }
@@ -83,16 +80,17 @@ class DPHelper(context: Context) {
         db = context?.openOrCreateDatabase(DATABASE_NAME , Context.MODE_PRIVATE , null)
     }
 
-    fun getAllData() : ArrayList<Datum>{
-        val arr = ArrayList<Datum>()
-        val sql = "Select * from Datum , Fromm , DataAttachments where fromm = id_from and Datum.id = id_attach"
+    fun getAllData() : ArrayList<Data>{
+        val arr = ArrayList<Data>()
+        val sql = "Select * from GraphObject , Fromm , DataAttachments where fromm = id_from and GraphObject.id = id_attach"
         val cursor = db?.rawQuery(sql , null)
         if (cursor != null) {
-            Log.d("AAABBB" , "SizeCursor : ${cursor.count}")
+            Log.d("AAA" , "SizeCursor : ${cursor.count}")
             while (cursor.moveToNext()){
-                val arrAtach = ArrayList<DataAttachments>()
-                arrAtach.add(
-                    DataAttachments(cursor.getString(cursor.getColumnIndex("description")),
+                val arrAttach = ArrayList<DataXX>()
+                arrAttach.add(
+                    DataXX(
+                        cursor.getString(cursor.getColumnIndex("description")),
                         null,
                         null,
                         cursor.getString(cursor.getColumnIndex("title")),
@@ -100,20 +98,19 @@ class DPHelper(context: Context) {
                         cursor.getString(cursor.getColumnIndex("url"))
                     ))
                 arr.add(
-                    Datum(
-                        cursor.getString(cursor.getColumnIndex("created_time")).toLong(),
+                    Data(
+                        cursor.getString(cursor.getColumnIndex("createdTime")).toLong(),
                         cursor.getString(0),
                         cursor.getString(cursor.getColumnIndex("message")),
-                        cursor.getString(cursor.getColumnIndex("object_id")),
-                        Likes(null),
                         From(cursor.getString(cursor.getColumnIndex("name")),
                             null ,
-                            cursor.getString(cursor.getColumnIndex("id_from"))),
-
-                        Attachments(arrAtach)
+                            cursor.getString(cursor.getColumnIndex("id"))),
+                        Likes(null, null, null),
+                        Attachments(arrAttach),
+                        cursor.getString(cursor.getColumnIndex("objectId"))
                     )
                 )
-                Log.d("AAABBB" , "SizeArr : ${arr.size}")
+                Log.d("AAA" , "SizeArr : ${arr.size}")
 
             }
         }
@@ -121,7 +118,7 @@ class DPHelper(context: Context) {
         return arr
     }
 
-    fun insertData(arr : ArrayList<Datum>){
+    fun insertData(arr : ArrayList<Data>){
         for(datum in arr){
             val sqlCheckFrom = "Select * from Fromm where id_from = ${datum.from?.id}"
 
@@ -132,34 +129,34 @@ class DPHelper(context: Context) {
                     cursor.close()
                     val k = insertFrom(datum.from)
                     if(k != null && k <= 0){
-                       Toast.makeText(context , "Có sự cố xảy ra" , Toast.LENGTH_SHORT).show()
+                       Toast.makeText(context , "There is a problem" , Toast.LENGTH_SHORT).show()
                         return
                     }
                 }
 
-            // Insert Datum
+            // Insert GraphObject
             val contentValues = ContentValues()
-            contentValues.put("id", datum.id)
-            contentValues.put("created_time", datum.created_time.toString())
-            contentValues.put("message", datum.message)
-            contentValues.put("object_id", datum.object_id)
-            contentValues.put("fromm", datum.from?.id)
+            contentValues.put("id", datum.id.toString())
+            contentValues.put("created_time", datum.createdTime.toString())
+            contentValues.put("message", datum.message.toString())
+            contentValues.put("object_id", datum.objectId.toString())
+            contentValues.put("fromm", datum.from?.id.toString())
 
             val kqq = db?.insert("Datum", null, contentValues)
 
             if(kqq != null && kqq <= 0){
-                Toast.makeText(context , "Có sự cố xảyy raaa" , Toast.LENGTH_SHORT).show()
+                Toast.makeText(context , "There is a problem" , Toast.LENGTH_SHORT).show()
             }
             else{
-                val kq = insertAttachments(datum.attachments?.data?.get(0) , datum.id)
+                val kq = insertAttachments(datum.attachments!!.data!![0], datum.id)
                 if(kq != null && kq <= 0){
-                    Toast.makeText(context , "Có sự cố xảyy ra" , Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context , "There is a problem" , Toast.LENGTH_SHORT).show()
                 }
             }
         }
     }
 
-    private fun insertAttachments(dataAttachments : DataAttachments? , id : String?) : Long?{
+    private fun insertAttachments(dataAttachments : DataXX? , id : String?) : Long?{
         val contentValues = ContentValues()
         contentValues.put("id_attach", id)
         contentValues.put("title", dataAttachments?.title)

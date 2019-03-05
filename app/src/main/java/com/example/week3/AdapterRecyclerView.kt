@@ -14,11 +14,11 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.bumptech.glide.request.RequestOptions.bitmapTransform
-import com.example.week3.data.Datum
+import com.example.week3.modal.*
 import jp.wasabeef.glide.transformations.CropCircleTransformation
 
-@Suppress("DEPRECATION")
-class AdapterRecyclerView(val context: Context, private val arr: ArrayList<Datum>): RecyclerView.Adapter<AdapterRecyclerView.ViewHolder>() {
+@Suppress("DEPRECATION", "CAST_NEVER_SUCCEEDS")
+class AdapterRecyclerView(val context: Context, private val arr: ArrayList<Data>): RecyclerView.Adapter<AdapterRecyclerView.ViewHolder>() {
     enum class Type{
         profile_media,
         share,
@@ -35,7 +35,9 @@ class AdapterRecyclerView(val context: Context, private val arr: ArrayList<Datum
 
     override fun onBindViewHolder(p0: ViewHolder, p1: Int) {
         val datum = arr[p1]
-        p0.txtDate.text = DateUtils.getRelativeTimeSpanString(datum.created_time * 1000L , System.currentTimeMillis(),DateUtils.MINUTE_IN_MILLIS).toString()
+
+//        var date = SimpleDateFormat("dd-MM-yyyy hh:mm:ss").parse()
+        p0.txtDate.text = DateUtils.getRelativeTimeSpanString(datum.createdTime!! * 1000L , System.currentTimeMillis(),DateUtils.MINUTE_IN_MILLIS).toString()
 
         if(datum.attachments?.data?.get(0)?.url != null){
             p0.txtLink.text = datum.attachments.data[0].url
@@ -46,9 +48,9 @@ class AdapterRecyclerView(val context: Context, private val arr: ArrayList<Datum
         }
 
         val typeText = when(datum.attachments?.data?.get(0)?.type){
-            Type.share.name -> " đã share"
-            Type.cover_photo.name -> " đã thay đổi ảnh bìa"
-            Type.profile_media.name -> " đã thay đổi ảnh đại diện"
+            Type.share.name -> " shared"
+            Type.cover_photo.name -> " changed the cover photo"
+            Type.profile_media.name -> " changed the avatar"
             else -> ""
         }
         p0.txtType.text = typeText
@@ -59,9 +61,9 @@ class AdapterRecyclerView(val context: Context, private val arr: ArrayList<Datum
             p0.txtStatus.visibility = View.GONE
         else {
             p0.txtStatus.visibility = View.VISIBLE
-            if(!datum.message.any { it == '#' }) {
+            if(!datum.message.any { it == '#' })
                 p0.txtStatus.text = datum.message
-            } else{
+            else{
                 p0.txtStatus.text = datum.message
                 p0.txtStatus.setTextColor(Color.BLACK)
             }
@@ -76,14 +78,20 @@ class AdapterRecyclerView(val context: Context, private val arr: ArrayList<Datum
             .into(p0.imgAvatar)
 
         p0.txtLike.setOnClickListener {
-            p0.txtLike.setCompoundDrawablesWithIntrinsicBounds(R.drawable.fb_like, 0, 0, 0)
+            p0.txtLike.setCompoundDrawablesWithIntrinsicBounds(R.drawable.fb_liked, 0, 0, 0)
             p0.txtLike.setTextColor(Color.parseColor("#3578e5"))
         }
 
+//        viewHolder.likeView.setLikeViewStyle(LikeView.Style.STANDARD);
+//        viewHolder.likeView.setAuxiliaryViewPosition(LikeView.AuxiliaryViewPosition.INLINE)
+//        viewHolder.likeView.setObjectIdAndType(
+//            datum.object_id,
+//            LikeView.ObjectType.OPEN_GRAPH)
+
         p0.linear.setOnClickListener {
-//            var i = Intent(context, DetailsActivity::class.java)
-//            i.putExtra("datum" , datum)
-//            context.startActivity(i)
+            val i = Intent(context , PostsDetails::class.java)
+            i.putExtra("Data" , datum)
+            context.startActivity(i)
         }
     }
 

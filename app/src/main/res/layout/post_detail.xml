@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+>
+    <data>
+        <variable name="Data" type="com.example.week3.modal.Data"/>
+        <import type="android.view.View"/>
+    </data>
+
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        <android.support.v4.widget.NestedScrollView
+                android:id="@+id/nest"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:layout_above="@+id/linear"
+        >
+            <LinearLayout
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp"
+                    android:orientation="vertical"
+                    android:id="@+id/linearLayout"
+                    tools:context=".PostsDetails"
+                    android:focusableInTouchMode="true">
+
+                <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="5dp"
+                        android:padding="3dp"
+                        android:gravity="center_vertical">
+
+                    <ImageView
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:layout_marginEnd="5dp"
+                            app:imageUrlAvata = '@{Data.from.picture.data.url}'
+                            android:background="@android:color/transparent" android:contentDescription="@string/img_description"/>
+
+                    <LinearLayout android:layout_width="match_parent"
+                                  android:layout_height="match_parent"
+                                  android:gravity="center_vertical"
+                                  android:orientation="vertical">
+                        <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textStyle="bold"
+                                android:textSize="16sp"
+                                android:textColor="#565656"
+                                android:layout_marginBottom="2dp"
+                                android:visibility='@{Data.from.name == null ? View.GONE : View.VISIBLE}'
+                                android:text="@{Data.from.name}"/>
+                        <TextView
+                                android:id="@+id/txtTimeAgo"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="12sp"
+                        />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp"
+                        android:padding="2dp"
+                        android:textSize="14sp"
+                        android:visibility="@{Data.message == null ? View.GONE : View.VISIBLE}"
+                        android:text="@{Data.message}"/>
+
+                <ImageView
+                        android:id="@+id/img_detail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginBottom="5dp"
+                        android:scaleType="fitCenter"
+                        app:imageUrl="@{Data.attachments.data.get(0).media.image.src}"
+                        android:contentDescription="@string/img_description"/>
+                <LinearLayout android:layout_width="match_parent" android:layout_height="1dp"
+                              android:background="#d7d5d5"/>
+
+                <LinearLayout android:layout_width="match_parent"
+                              android:layout_height="wrap_content"
+                              android:paddingTop="5dp"
+                              android:paddingBottom="2dp">
+                    <TextView
+                            android:id="@+id/txtLike"
+                            android:layout_weight="1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:textSize="12sp"
+                            android:text="@string/like"
+                            android:paddingStart="30dp"
+                            android:paddingEnd="20dp"
+                            android:paddingTop="5dp"
+                            android:paddingBottom="5dp"
+                            android:drawableStart="@drawable/fb_like"
+                            android:focusable="true"/>
+                    <!--<com.facebook.share.widget.LikeView-->
+                    <!--android:id="@+id/likeView"-->
+                    <!--android:layout_width="0dp"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:clickable="true"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:focusable="true"/>-->
+                    <TextView
+                            android:id="@+id/txtComment"
+                            android:layout_weight="1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:textSize="12sp"
+                            android:text="@string/comment"
+                            android:paddingStart="20dp"
+                            android:paddingEnd="10dp"
+                            android:paddingTop="5dp"
+                            android:paddingBottom="5dp"
+                            android:drawableStart="@drawable/fb_comment"
+                            android:focusable="true"/>
+                    <TextView
+                            android:id="@+id/txtShare"
+                            android:layout_weight="1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="@string/share"
+                            android:textSize="12sp"
+                            android:paddingStart="25dp"
+                            android:paddingEnd="15dp"
+                            android:paddingTop="5dp"
+                            android:paddingBottom="5dp"
+                            android:drawableStart="@drawable/fb_share"
+                            android:focusable="true"/>
+                </LinearLayout>
+                <android.support.v7.widget.RecyclerView
+                        android:id="@+id/recycler_view_cmt"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                </android.support.v7.widget.RecyclerView>
+
+            </LinearLayout>
+
+        </android.support.v4.widget.NestedScrollView>
+
+        <LinearLayout
+                android:id="@+id/linear"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:orientation="vertical">
+            <TextView
+                    android:id="@+id/txtLength"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:text="@string/_140"
+                    android:textSize="12sp"
+                    android:paddingEnd="15dp" tools:ignore="RtlSymmetry"/>
+            <FrameLayout
+                    android:id="@+id/frmm"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+            >
+
+                <EditText
+                        android:id="@+id/edtCmt"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/what_do_you_think_about_this"
+                        android:textSize="14sp"
+                        android:layout_gravity="bottom"
+                        style="@style/MyStyle"
+                        android:inputType="text" tools:ignore="Autofill"/>
+
+                <ImageButton
+                        android:id="@+id/btnSend"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:background="@null"
+                        android:scaleType="center"
+                        android:layout_marginEnd="5dp"
+                        android:src="@drawable/fb_send"
+                        android:layout_gravity="end|bottom"
+                        android:contentDescription="@string/img_description"/>
+            </FrameLayout>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</layout>
