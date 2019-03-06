@@ -1,4 +1,4 @@
-# Week3 - Resources - Data-driven Android Applications
+# Week3_Whiss - Resources - Data-driven Android Applications
 
 This week we will be building a facebook client which displays the home wall user.
 
@@ -32,7 +32,7 @@ The following **bonus** features are implemented:
 
  * [x] User can see embedded image media within the tweet detail view (1 point)
  * [ ] User can watch embedded video within the tweet (1 point)
- * [x] Compose activity is replaced with a modal overlay (2 points)
+ * [ ] Compose activity is replaced with a modal overlay (2 points)
  * [x] Use Parcelable instead of Serializable using the popular Parceler library. (1 point)
  * [x] Leverage RecyclerView as a replacement for the ListView and ArrayAdapter for all lists of tweets. (2 points)
  * [ ] Move the "Compose" action to a FloatingActionButton instead of on the AppBar. (1 point)
