@@ -82,10 +82,10 @@ class DPHelper(context: Context) {
 
     fun getAllData() : ArrayList<Data>{
         val arrData = ArrayList<Data>()
-        val sql = "Select * from GraphObject , Fromm , DataAttachments where fromm = id_from and GraphObject.id = id_attach"
+        val sql = "Select * from Datum , Fromm , DataAttachments where fromm = id_from and Datum.id = id_attach"
         val cursor = db?.rawQuery(sql , null)
         if (cursor != null) {
-            Log.d("AAA" , "SizeCursor : ${cursor.count}")
+            Log.d("size_cursor" , "SizeCursor : ${cursor.count}")
             while (cursor.moveToNext()){
                 val arrAttach = ArrayList<DataXX>()
                 arrAttach.add(
@@ -99,7 +99,7 @@ class DPHelper(context: Context) {
                     ))
                 arrData.add(
                     Data(
-                        cursor.getString(cursor.getColumnIndex("createdTime")).toLong(),
+                        cursor.getString(cursor.getColumnIndex("created_time")).toLong(),
                         cursor.getString(0),
                         cursor.getString(cursor.getColumnIndex("message")),
                         From(cursor.getString(cursor.getColumnIndex("name")),
@@ -107,10 +107,10 @@ class DPHelper(context: Context) {
                             cursor.getString(cursor.getColumnIndex("id"))),
                         Likes(null, null, null),
                         Attachments(arrAttach),
-                        cursor.getString(cursor.getColumnIndex("objectId"))
+                        cursor.getString(cursor.getColumnIndex("object_id"))
                     )
                 )
-                Log.d("AAA" , "SizeArr : ${arrData.size}")
+                Log.d("size_arr" , "SizeArr : ${arrData.size}")
 
             }
         }
@@ -128,10 +128,7 @@ class DPHelper(context: Context) {
                 {
                     cursor.close()
                     val k = insertFrom(data.from)
-                    if(k != null && k <= 0){
-                       Toast.makeText(context , "There is a problem" , Toast.LENGTH_SHORT).show()
-                        return
-                    }
+                    if(k != null && k <= 0) return
                 }
 
             // Insert GraphObject
@@ -145,12 +142,12 @@ class DPHelper(context: Context) {
             val kqq = db?.insert("Datum", null, contentValues)
 
             if(kqq != null && kqq <= 0){
-                Toast.makeText(context , "There is a problem" , Toast.LENGTH_SHORT).show()
+                Log.d("kqq" , "Size : $kqq")
             }
             else{
                 val kq = insertAttachments(data.attachments!!.data!![0], data.id)
                 if(kq != null && kq <= 0){
-                    Toast.makeText(context , "There is a problem" , Toast.LENGTH_SHORT).show()
+                    Log.d("kq" , "Size : $kq")
                 }
             }
         }
