@@ -16,7 +16,6 @@ import android.text.TextWatcher
 import android.text.format.DateUtils
 import android.util.Log
 import android.widget.ImageView
-import android.widget.Toast
 import com.bumptech.glide.request.RequestOptions
 import com.example.week3.databinding.PostDetailBinding
 import com.example.week3.modal.Data
@@ -36,7 +35,7 @@ class PostsDetails: AppCompatActivity() {
 
         @BindingAdapter("imageUrlAvata")
         @JvmStatic
-        fun loadImageAvata(view: ImageView, url: String?) {
+        fun loadImageAvatar(view: ImageView, url: String?) {
             GlideApp.with(view.context).load(url)
                 .placeholder(R.drawable.user)
                 .apply(RequestOptions.bitmapTransform(CropCircleTransformation()))
@@ -47,24 +46,24 @@ class PostsDetails: AppCompatActivity() {
 
     var maxLength = 140
 
-    lateinit var adapter : AdapterRecyclerViewCmt
-    lateinit var arr : ArrayList<String>
+    private lateinit var adapter : AdapterRecyclerViewCmt
+    private lateinit var arr : ArrayList<String>
 
-    var datum : Data? = null
+    var data : Data? = null
 
-    var bind : PostDetailBinding? = null
+    private var bind : PostDetailBinding? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         title = "Posts"
-        datum  = intent.extras.getParcelable("Data")
-        Log.d("cmt" ,datum.toString())
-        if(datum != null){
+        data  = intent!!.extras!!.getParcelable("Data")
+        Log.d("cmt" ,data.toString())
+        if(data != null){
             bind = DataBindingUtil.setContentView(this , R.layout.post_detail)
-            bind?.data = datum
+            bind?.data = data
 
             txtTimeAgo.text =
-                DateUtils.getRelativeTimeSpanString(datum!!.createdTime!! * 1000L , System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS).toString()
+                DateUtils.getRelativeTimeSpanString(data!!.createdTime!! * 1000L , System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS).toString()
         }
 
         val arrayOfInputFilters = arrayOfNulls<InputFilter>(1)
@@ -91,8 +90,8 @@ class PostsDetails: AppCompatActivity() {
 
         adapter = AdapterRecyclerViewCmt(applicationContext ,  arr)
         recycler_view_cmt?.layoutManager = LinearLayoutManager(applicationContext , LinearLayoutManager.VERTICAL , false)
-        val divi = DividerItemDecoration(applicationContext , LinearLayoutManager.VERTICAL)
-        recycler_view_cmt?.addItemDecoration(divi)
+        val divider = DividerItemDecoration(applicationContext , LinearLayoutManager.VERTICAL)
+        recycler_view_cmt?.addItemDecoration(divider)
         recycler_view_cmt?.adapter = adapter
 
         img_detail.setOnClickListener {
@@ -100,7 +99,7 @@ class PostsDetails: AppCompatActivity() {
             val dialog = DialogImageFull()
 
             val bundle = Bundle()
-            bundle.putString("url" , datum?.attachments?.data!![0].media?.image?.src)
+            bundle.putString("url" , data?.attachments?.data!![0].media?.image?.src)
             dialog.arguments = bundle
 
             dialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.dialog)

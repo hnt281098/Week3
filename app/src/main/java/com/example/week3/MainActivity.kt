@@ -53,8 +53,7 @@ class MainActivity : AppCompatActivity() {
         checkSign()
 
         adapter = AdapterRecyclerView(applicationContext, arrData)
-        val layout = LinearLayoutManager(applicationContext, LinearLayoutManager.VERTICAL, false)
-        recycler_view.layoutManager = layout
+        recycler_view.layoutManager = LinearLayoutManager(applicationContext, LinearLayoutManager.VERTICAL, false)
         recycler_view.adapter = adapter
 
         loginButton = this.findViewById(R.id.login_button)
@@ -84,10 +83,10 @@ class MainActivity : AppCompatActivity() {
     private fun checkSign(){
         if (AccessToken.getCurrentAccessToken() == null) { // Logout
             login_button.visibility = View.VISIBLE
-            supportActionBar?.hide()
             ic_fb.visibility = View.VISIBLE
             login_button.isEnabled = true
             swipeRefresh.isEnabled = false
+            supportActionBar?.hide()
         }
         else{ // Login
             if(!isNetworkAvailable()){
@@ -102,9 +101,9 @@ class MainActivity : AppCompatActivity() {
             }
             title = "NewFit"
             login_button.visibility = View.GONE
-            supportActionBar?.show()
             ic_fb.visibility = View.GONE
             login_button.isEnabled = false
+            supportActionBar?.show()
         }
     }
 
@@ -165,7 +164,7 @@ class MainActivity : AppCompatActivity() {
                 if(response.jsonObject != null){
                     pareData(response.jsonObject)
                     scrollListener.resetState()
-                    Log.d("abc" , "refresh")
+                    Log.d("refresh" , "refresh")
                     swipeRefresh.isRefreshing = false
                 }
             }
@@ -180,7 +179,6 @@ class MainActivity : AppCompatActivity() {
         val nextResultsRequests = lastGraphResponse?.getRequestForPagedResults(GraphResponse.PagingDirection.NEXT)
         if (nextResultsRequests != null) {
             nextResultsRequests.callback = GraphRequest.Callback { response ->
-
                 pareData(response.jsonObject)
                 lastGraphResponse = response
             }

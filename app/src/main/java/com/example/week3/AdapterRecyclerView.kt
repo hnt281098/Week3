@@ -18,7 +18,7 @@ import com.example.week3.modal.*
 import jp.wasabeef.glide.transformations.CropCircleTransformation
 
 @Suppress("DEPRECATION", "CAST_NEVER_SUCCEEDS")
-class AdapterRecyclerView(val context: Context, private val arr: ArrayList<Data>): RecyclerView.Adapter<AdapterRecyclerView.ViewHolder>() {
+class AdapterRecyclerView(val context: Context, private val arrData: ArrayList<Data>): RecyclerView.Adapter<AdapterRecyclerView.ViewHolder>() {
     enum class Type{
         profile_media,
         share,
@@ -30,24 +30,23 @@ class AdapterRecyclerView(val context: Context, private val arr: ArrayList<Data>
     }
 
     override fun getItemCount(): Int {
-        return arr.size
+        return arrData.size
     }
 
     override fun onBindViewHolder(p0: ViewHolder, p1: Int) {
-        val datum = arr[p1]
+        val data = arrData[p1]
 
-//        var date = SimpleDateFormat("dd-MM-yyyy hh:mm:ss").parse()
-        p0.txtDate.text = DateUtils.getRelativeTimeSpanString(datum.createdTime!! * 1000L , System.currentTimeMillis(),DateUtils.MINUTE_IN_MILLIS).toString()
+        p0.txtDate.text = DateUtils.getRelativeTimeSpanString(data.createdTime!! * 1000L , System.currentTimeMillis(),DateUtils.MINUTE_IN_MILLIS).toString()
 
-        if(datum.attachments?.data?.get(0)?.url != null){
-            p0.txtLink.text = datum.attachments.data[0].url
+        if(data.attachments?.data?.get(0)?.url != null){
+            p0.txtLink.text = data.attachments.data[0].url
             p0.txtLink.visibility = View.VISIBLE
         }
         else {
             p0.txtLink.visibility = View.GONE
         }
 
-        val typeText = when(datum.attachments?.data?.get(0)?.type){
+        val typeText = when(data.attachments?.data?.get(0)?.type){
             Type.share.name -> " shared"
             Type.cover_photo.name -> " changed the cover photo"
             Type.profile_media.name -> " changed the avatar"
@@ -55,24 +54,24 @@ class AdapterRecyclerView(val context: Context, private val arr: ArrayList<Data>
         }
         p0.txtType.text = typeText
 
-        p0.txt.text = datum.from?.name
+        p0.txt.text = data.from?.name
 
-        if(datum.message == null)
+        if(data.message == null)
             p0.txtStatus.visibility = View.GONE
         else {
             p0.txtStatus.visibility = View.VISIBLE
-            if(!datum.message.any { it == '#' })
-                p0.txtStatus.text = datum.message
+            if(!data.message.any { it == '#' })
+                p0.txtStatus.text = data.message
             else{
-                p0.txtStatus.text = datum.message
+                p0.txtStatus.text = data.message
                 p0.txtStatus.setTextColor(Color.BLACK)
             }
 
         }
-        GlideApp.with(context).load(datum.attachments?.data?.get(0)?.media?.image?.src)
+        GlideApp.with(context).load(data.attachments?.data?.get(0)?.media?.image?.src)
             .placeholder(R.drawable.image_placeholder)
             .into(p0.img)
-        GlideApp.with(context).load(datum.from?.picture?.data?.url)
+        GlideApp.with(context).load(data.from?.picture?.data?.url)
             .placeholder(R.drawable.user)
             .apply(bitmapTransform(CropCircleTransformation()))
             .into(p0.imgAvatar)
@@ -82,15 +81,9 @@ class AdapterRecyclerView(val context: Context, private val arr: ArrayList<Data>
             p0.txtLike.setTextColor(Color.parseColor("#3578e5"))
         }
 
-//        viewHolder.likeView.setLikeViewStyle(LikeView.Style.STANDARD);
-//        viewHolder.likeView.setAuxiliaryViewPosition(LikeView.AuxiliaryViewPosition.INLINE)
-//        viewHolder.likeView.setObjectIdAndType(
-//            datum.object_id,
-//            LikeView.ObjectType.OPEN_GRAPH)
-
         p0.linear.setOnClickListener {
             val i = Intent(context , PostsDetails::class.java)
-            i.putExtra("Data" , datum)
+            i.putExtra("Data" , data)
             context.startActivity(i)
         }
     }

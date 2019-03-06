@@ -81,7 +81,7 @@ class DPHelper(context: Context) {
     }
 
     fun getAllData() : ArrayList<Data>{
-        val arr = ArrayList<Data>()
+        val arrData = ArrayList<Data>()
         val sql = "Select * from GraphObject , Fromm , DataAttachments where fromm = id_from and GraphObject.id = id_attach"
         val cursor = db?.rawQuery(sql , null)
         if (cursor != null) {
@@ -97,7 +97,7 @@ class DPHelper(context: Context) {
                         cursor.getString(cursor.getColumnIndex("type")),
                         cursor.getString(cursor.getColumnIndex("url"))
                     ))
-                arr.add(
+                arrData.add(
                     Data(
                         cursor.getString(cursor.getColumnIndex("createdTime")).toLong(),
                         cursor.getString(0),
@@ -110,24 +110,24 @@ class DPHelper(context: Context) {
                         cursor.getString(cursor.getColumnIndex("objectId"))
                     )
                 )
-                Log.d("AAA" , "SizeArr : ${arr.size}")
+                Log.d("AAA" , "SizeArr : ${arrData.size}")
 
             }
         }
         cursor?.close()
-        return arr
+        return arrData
     }
 
     fun insertData(arr : ArrayList<Data>){
-        for(datum in arr){
-            val sqlCheckFrom = "Select * from Fromm where id_from = ${datum.from?.id}"
+        for(data in arr){
+            val sqlCheckFrom = "Select * from Fromm where id_from = ${data.from?.id}"
 
             val cursor = db?.rawQuery(sqlCheckFrom , null)
             if(cursor != null)
                 if(cursor.count <= 0)
                 {
                     cursor.close()
-                    val k = insertFrom(datum.from)
+                    val k = insertFrom(data.from)
                     if(k != null && k <= 0){
                        Toast.makeText(context , "There is a problem" , Toast.LENGTH_SHORT).show()
                         return
@@ -136,11 +136,11 @@ class DPHelper(context: Context) {
 
             // Insert GraphObject
             val contentValues = ContentValues()
-            contentValues.put("id", datum.id.toString())
-            contentValues.put("created_time", datum.createdTime.toString())
-            contentValues.put("message", datum.message.toString())
-            contentValues.put("object_id", datum.objectId.toString())
-            contentValues.put("fromm", datum.from?.id.toString())
+            contentValues.put("id", data.id.toString())
+            contentValues.put("created_time", data.createdTime.toString())
+            contentValues.put("message", data.message.toString())
+            contentValues.put("object_id", data.objectId.toString())
+            contentValues.put("fromm", data.from?.id.toString())
 
             val kqq = db?.insert("Datum", null, contentValues)
 
@@ -148,7 +148,7 @@ class DPHelper(context: Context) {
                 Toast.makeText(context , "There is a problem" , Toast.LENGTH_SHORT).show()
             }
             else{
-                val kq = insertAttachments(datum.attachments!!.data!![0], datum.id)
+                val kq = insertAttachments(data.attachments!!.data!![0], data.id)
                 if(kq != null && kq <= 0){
                     Toast.makeText(context , "There is a problem" , Toast.LENGTH_SHORT).show()
                 }
