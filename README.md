@@ -14,9 +14,9 @@ The following **required** functionality is completed:
   * [x] User should be displayed the relative timestamp for each tweet "8m", "7h" (1 point)
   * [x] User can view more tweets as they scroll with infinite pagination (1 point)
 * User can compose a new tweet
-  * [x] User can click a “Compose” icon in the Action Bar on the top right (1 point)
-  * [x] User can then enter a new tweet and post this to twitter (2 points)
-  * [x] User is taken back to home timeline with new tweet visible in timeline (1 point)
+  * [ ] User can click a “Compose” icon in the Action Bar on the top right (1 point)
+  * [ ] User can then enter a new tweet and post this to twitter (2 points)
+  * [ ] User is taken back to home timeline with new tweet visible in timeline (1 point)
 
 The following **optional** features are implemented:
 
